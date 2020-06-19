@@ -9,20 +9,25 @@ Assuming that you have installed all prerequisites (check https://github.com/fra
 
 1. open ganache cli, set gas limit to avoid testing issues
 
-ganache-cli --gas-limit 46000000
+$ ganache-cli --gas-limit 46000000
 
 
 2. Compile contracts
 
-truffle migrate --reset
+$ truffle migrate --reset
 
 
 3. Run graphical interface
 
-npm run dev
+$ npm run dev
 
 
 For testing, in /src/js/app.js you may hardcode one of the addresses created by ganache-cli on top of the file, should Web3API not load properly the address.
+
+![Example of the query website](query.png)
+
+
+![Example of the insert form](insert.png)
 
 
 

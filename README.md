@@ -7,6 +7,8 @@ The project contains smart contract and graphical interface to query and insert 
 
 Assuming that you have installed all prerequisites (check https://github.com/francasino/smartContracts):
 
+Unzip node_modules.zip
+
 1. open ganache cli, set gas limit to avoid testing issues
 
 $ ganache-cli --gas-limit 46000000

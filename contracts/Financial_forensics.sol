@@ -2,7 +2,7 @@ pragma solidity ^0.5.0;
 pragma experimental ABIEncoderV2;
 
 /* 
-COPYRIGHT FRAN CASINO. 2019.
+COPYRIGHT FRAN CASINO. 2020.
 REQUIRE CLAUSES DEACTIVATED, TO BE DEFINED ACCORDING TO EACH SITUATION
 SC FOR FINANCIAL FORENSIC COC
 */
@@ -21,7 +21,7 @@ contract Financial_forensics{
         address [] investigators; // investigators enrolled to the case
         address maker; // who  created
         string globalId; // global id in the case of external systems 
-        bool status; // open case, closed case
+        string status; // open case, closed case
         uint timestamp; // creation
         string hashIPFS; // refernce to manufacturing description, serial number, IMEI
     }
@@ -37,6 +37,8 @@ contract Financial_forensics{
         string description; // description
         string hashIPFS; // hash of event
         uint timestamp;
+        address destiny; // for custody changes
+        string status; // to map status such as deleted, closed, etc
         address maker; // who  updates
     }
 
@@ -44,6 +46,7 @@ contract Financial_forensics{
     // since mappings cant be looped and is difficult the have a count like array
     // we need a var to store the coutings  
     // useful also to iterate the mapping 
+
 
     uint public casesCount;
     uint public eventsCount;
@@ -80,9 +83,9 @@ contract Financial_forensics{
         addCase("Embezzlement Bank 1","Investigation for embezzlement in a Greek Bank","Hellenic Police","HP000001",1573564413,"QmY8xHZzhF1dGDJMa4f7siU3SPTW9pHFpxX8xxJzq6Y1W4");
         addCase("Money Laundering User A","Investigation for money laundering suspect A","Interpol","INTAAA2934",1573864513,"QmW5oPVT68rihULJ9y8szree9Jrrjqrhxtn5tjkeoQkuwF");
         addCase("Embezzlement Bank 2","Investigation for embezzlement in an European Bank","Europol","EUPfn398g",1574594486,"QmNbRXGouduUGV31mMYhpx3DqE4Ca48M5KmpgKxVD8V6oz");
-        addEvent(1,"New Evidence", "Screenshot","QmbK6stJke3kQoH8t3di2qzzC1rRRvoXoRsnC2WGvZVVVP",1573564414); //
-        addEvent(2,"New Evidence", "Document","QmbkbFcPpMLR5MTiKtsP8zpQYN9grWsaiTKGV2C9bAEiVE",1573564424); //
-        addEvent(3,"New Report", "Report","QmbqGAjrJV9ybebK8TXq5MC2x4FWXaXq7sPp9jSCjcANbK",1573564435); //
+        addEvent(1,"New Evidence", "Screenshot","QmbK6stJke3kQoH8t3di2qzzC1rRRvoXoRsnC2WGvZVVVP","active",1573564414); //
+        addEvent(2,"New Evidence", "Document","QmbkbFcPpMLR5MTiKtsP8zpQYN9grWsaiTKGV2C9bAEiVE","active",1573564424); //
+        addEvent(3,"New Report", "Report","QmbqGAjrJV9ybebK8TXq5MC2x4FWXaXq7sPp9jSCjcANbK","active",1573564435); //
         addInvestigatorCase(1, 0x395BE1C1Eb316f82781462C4C028893e51d8b2a5);
         //addComponent();
         triggered=false;
@@ -108,10 +111,10 @@ contract Financial_forensics{
         cases[casesCount].description = _description;
         cases[casesCount].entity_responsible = _entity_responsible;
         cases[casesCount].numberofinvestigators = 1;
-        cases[casesCount].numberofevents = 0;                      
+        cases[casesCount].numberofevents = 0;
         cases[casesCount].maker = msg.sender;
         cases[casesCount].globalId = _globalID;
-        cases[casesCount].status = true;
+        cases[casesCount].status = "active";
 	    cases[casesCount].timestamp = _timestamp;
         cases[casesCount].hashIPFS = _hashIpfs;
 
@@ -126,6 +129,14 @@ contract Financial_forensics{
         emit updateEvent(); // trigger event 
     }
 
+ // only specific stakeholders, can be changed
+    function updateCaseStatus (uint _caseId, string memory _status) public { 
+        require(_caseId > 0 && _caseId <= casesCount); 
+        //require(_caseId.maker == msg.sender);
+
+        cases[_caseId].status = _status;  // update conditions
+        emit updateEvent(); // trigger event 
+    }
 
      // only specific stakeholders, can be changed
     function testupdateEvent (uint _caseId) public { 
@@ -188,7 +199,7 @@ contract Financial_forensics{
     
     //EVENT OPERATIONS********************************************
 
-    function addEvent (uint _caseId, string memory _type_event, string memory _description, string memory _hashIPFS, uint _timestamp) public {  // acts as update location
+    function addEvent (uint _caseId, string memory _type_event, string memory _description, string memory _hashIPFS, string memory _status, uint _timestamp) public {  // acts as update location
         require(_caseId > 0 && _caseId <= casesCount); 
         //require(valid investigator);
 
@@ -199,13 +210,25 @@ contract Financial_forensics{
         events[eventsCount].type_event = _type_event;
         events[eventsCount].description = _description;
         events[eventsCount].hashIPFS = _hashIPFS;
+        events[eventsCount].status = _status;
         events[eventsCount].timestamp = _timestamp; 
         events[eventsCount].maker = msg.sender;   
-        events[eventsCount] = Event(eventsCount,_caseId,_type_event,_description,_hashIPFS,_timestamp, msg.sender);
+        //events[eventsCount].destiny = msg.sender;   // COMMENTED CUSTODY CHAIN IN THIS VERSION
+        events[eventsCount] = Event(eventsCount,_caseId,_type_event,_description,_hashIPFS,_timestamp, _status, msg.sender);
         cases[_caseId].events_case.push(eventsCount); // we store the trace reference in the corresponding event
         cases[_caseId].numberofevents++;
+        //
         //this will give us the set of ID traces about our caseid
         emit updateEvent();
+    }
+
+    // only specific stakeholders, can be changed
+    function updateEventStatus (uint _eventId, string memory _status) public { 
+        require(_eventId > 0 && _eventId <= eventsCount); 
+        //require(_caseId.maker == msg.sender);
+
+        events[_eventId].status = _status;  // update conditions
+        emit updateEvent(); // trigger event 
     }
 
     // returns the number of  events for specific case

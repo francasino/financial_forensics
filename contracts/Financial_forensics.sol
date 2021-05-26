@@ -37,7 +37,7 @@ contract Financial_forensics{
         string description; // description
         string hashIPFS; // hash of event
         uint timestamp;
-        address destiny; // for custody changes
+        //address destiny; // for custody changes
         string status; // to map status such as deleted, closed, etc
         address maker; // who  updates
     }

@@ -76,7 +76,7 @@ App = {
     var descevent = $('#Description').val(); 
     var dateevent = $('#Date').val(); 
     var hashevent = $('#Hash').val();   
-     
+    var statusevent ="active"; 
     if (caseevent != null && typeevent != null && descevent != null && dateevent != null && hashevent != null){
          //testupdateEvent
 
@@ -90,7 +90,7 @@ App = {
           //     console.error(err);
           //   });
             App.contracts.Financial_forensics.deployed().then(function(instance) {
-          return instance.addEvent(caseevent,typeevent,descevent,hashevent,dateevent,{ from: App.account, gas:1000000 }); // you have to specify gas in case of call above 90k gas
+          return instance.addEvent(caseevent,typeevent,descevent,hashevent,statusevent,dateevent,{ from: App.account, gas:1000000 }); // you have to specify gas in case of call above 90k gas
             }).then(function(result) {
              // Wait for votes to update
               //$("#content").hide();
